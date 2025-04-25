@@ -9,7 +9,7 @@ import { SiteConfig } from "./types";
  */
 export function getSiteConfig(): AxiosPromise<Result<SiteConfig>> {
   return request({
-    url: "/admin/site/list",
+    url: "/admin/site/config",
     method: "get",
   });
 }

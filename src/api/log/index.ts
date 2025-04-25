@@ -1,7 +1,14 @@
 import { PageResult, Result } from "@/model";
 import request from "@/utils/request";
 import { AxiosPromise } from "axios";
-import { ExceptionLog, LogQuery, OperationLog, TaskLog, VisitLog, VisitQuery } from "./types";
+import {
+  ExceptionLog,
+  LogQuery,
+  OperationLog,
+  TaskLog,
+  VisitLog,
+  VisitQuery,
+} from "./types";
 
 /**
  * 查看操作日志列表
@@ -22,7 +29,9 @@ export function getOperationLogList(
  * 删除操作日志
  * @param data 日志id集合
  */
-export function deleteOperation(data: number[]): AxiosPromise<Result<null>> {
+export function deleteOperation(data: {
+  ids: number[];
+}): AxiosPromise<Result<null>> {
   return request({
     url: "/admin/operation/delete",
     method: "delete",
@@ -62,7 +71,9 @@ export function deleteException(data: number[]): AxiosPromise<Result<null>> {
  * @param params 查询条件
  * @returns 访问日志列表
  */
-export function getVisitLogList(params?: VisitQuery): AxiosPromise<Result<PageResult<VisitLog[]>>> {
+export function getVisitLogList(
+  params?: VisitQuery
+): AxiosPromise<Result<PageResult<VisitLog[]>>> {
   return request({
     url: "/admin/visit/list",
     method: "get",
@@ -87,7 +98,9 @@ export function deleteVisit(data: number[]): AxiosPromise<Result<null>> {
  * @param params 查询条件
  * @returns 任务日志列表
  */
-export function getTaskLogList(params?: LogQuery): AxiosPromise<Result<PageResult<TaskLog[]>>> {
+export function getTaskLogList(
+  params?: LogQuery
+): AxiosPromise<Result<PageResult<TaskLog[]>>> {
   return request({
     url: "/admin/taskLog/list",
     method: "get",

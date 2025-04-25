@@ -8,7 +8,9 @@ import { Album, AlbumForm, AlbumQuery } from "./types";
  * @param params 查询条件
  * @returns 相册列表
  */
-export function getAlbumList(params: AlbumQuery): AxiosPromise<Result<PageResult<Album[]>>> {
+export function getAlbumList(
+  params: AlbumQuery
+): AxiosPromise<Result<PageResult<Album[]>>> {
   return request({
     url: "/admin/album/list",
     method: "get",
@@ -23,7 +25,7 @@ export function getAlbumList(params: AlbumQuery): AxiosPromise<Result<PageResult
  */
 export function editAlbum(albumId: number): AxiosPromise<Result<AlbumForm>> {
   return request({
-    url: `/admin/album/edit/${albumId}`,
+    url: `/admin/album/detail/${albumId}`,
     method: "get",
   });
 }
@@ -56,7 +58,9 @@ export function updateAlbum(data: AlbumForm): AxiosPromise<Result<null>> {
  * 删除相册
  * @param data 相册id
  */
-export function deleteAlbum(albumId: number | undefined): AxiosPromise<Result<null>> {
+export function deleteAlbum(
+  albumId: number | undefined
+): AxiosPromise<Result<null>> {
   return request({
     url: `/admin/album/delete/${albumId}`,
     method: "delete",

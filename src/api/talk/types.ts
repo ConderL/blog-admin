@@ -36,6 +36,10 @@ export interface Talk {
    * 发布时间
    */
   createTime: string;
+  /**
+   * 用户信息
+   */
+  user: Record<string, any>;
 }
 
 /**

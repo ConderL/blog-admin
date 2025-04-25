@@ -8,7 +8,9 @@ import { AlbumInfo, Photo, PhotoForm, PhotoInfo, PhotoQuery } from "./types";
  * @param params 查询条件
  * @returns 照片列表
  */
-export function getPhotoList(params: PhotoQuery): AxiosPromise<Result<PageResult<Photo[]>>> {
+export function getPhotoList(
+  params: PhotoQuery
+): AxiosPromise<Result<PageResult<Photo[]>>> {
   return request({
     url: "/admin/photo/list",
     method: "get",
@@ -23,7 +25,7 @@ export function getPhotoList(params: PhotoQuery): AxiosPromise<Result<PageResult
  */
 export function getAlbumInfo(albumId: number): AxiosPromise<Result<AlbumInfo>> {
   return request({
-    url: `/admin/photo/album/${albumId}/info`,
+    url: `/admin/album/detail/${albumId}`,
     method: "get",
   });
 }
