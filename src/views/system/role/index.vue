@@ -102,6 +102,7 @@
             :active-value="0"
             :inactive-value="1"
             @change="handleChangeStatus(scope.row)"
+            v-hasPerm="['system:role:update']"
           ></el-switch>
         </template>
       </el-table-column>

@@ -120,10 +120,10 @@ const data = reactive({
   onlineList: [] as Online[],
 });
 const { count, loading, queryParams, onlineList } = toRefs(data);
-const kick = (token: string) => {
+const kick = (id: string) => {
   messageConfirm("确定要下线该用户吗?")
     .then(() => {
-      kickOutUser(token).then(({ data }) => {
+      kickOutUser({ socketId: id }).then(({ data }) => {
         if (data.flag) {
           notifySuccess(data.msg);
           getList();

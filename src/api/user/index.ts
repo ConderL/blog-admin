@@ -93,10 +93,13 @@ export function getOnlineList(
  * 下线用户
  * @param token 在线token
  */
-export function kickOutUser(token: string): AxiosPromise<Result<null>> {
+export function kickOutUser(data: {
+  socketId: string;
+}): AxiosPromise<Result<null>> {
   return request({
-    url: `/admin/online/kick/${token}`,
-    method: "get",
+    url: `/admin/online/forceOffline`,
+    method: "post",
+    data,
   });
 }
 
