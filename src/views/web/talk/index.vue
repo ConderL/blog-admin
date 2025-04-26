@@ -3,7 +3,12 @@
     <!-- 操作 -->
     <el-row :gutter="10" class="mb15">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="Promotion" @click="openModel"
+        <el-button
+          type="primary"
+          plain
+          icon="Promotion"
+          @click="openModel"
+          v-hasPerm="['web:talk:add']"
           >发布说说</el-button
         >
       </el-col>
@@ -42,10 +47,14 @@
             </el-icon>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item :command="'update' + talk.id"
+                <el-dropdown-item
+                  :command="'update' + talk.id"
+                  v-if="checkPermission(['web:talk:update'])"
                   >编辑</el-dropdown-item
                 >
-                <el-dropdown-item :command="'delete' + talk.id"
+                <el-dropdown-item
+                  :command="'delete' + talk.id"
+                  v-if="checkPermission(['web:talk:delete'])"
                   >删除</el-dropdown-item
                 >
               </el-dropdown-menu>
@@ -246,6 +255,7 @@ import { AxiosResponse } from "axios";
 import { UploadFile, UploadRawFile } from "element-plus";
 import * as imageConversion from "image-conversion";
 import { computed, onMounted, reactive, ref, toRefs } from "vue";
+import { checkPermission } from "@/utils/permission";
 
 const editorRef = ref();
 const dialogImageUrl = ref("");

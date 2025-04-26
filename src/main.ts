@@ -27,6 +27,8 @@ import "@vavt/cm-extension/dist/previewTheme/arknights.css";
 import MarkExtension from "markdown-it-mark";
 import Anchor from "markdown-it-anchor";
 import LinkAttr from "markdown-it-link-attributes";
+import { setupPermissionInterceptor } from "@/directive/permission";
+import setupGlobalProperties from "./plugins/globalProperties";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -120,4 +122,6 @@ app.component("Pagination", Pagination);
 app.component("RightToolbar", RightToolbar);
 app.component("Echarts", Echarts);
 app.use(ElementPlus);
+setupPermissionInterceptor(app);
+setupGlobalProperties(app);
 app.mount("#app");

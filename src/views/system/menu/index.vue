@@ -40,6 +40,7 @@
           plain
           icon="Plus"
           @click="handleAdd(undefined)"
+          v-hasPerm="['system:menu:add']"
           >新增</el-button
         >
       </el-col>
@@ -144,6 +145,7 @@
             link
             icon="Edit"
             @click="handleEdit(scope.row.id)"
+            v-hasPerm="['system:menu:update']"
             >编辑</el-button
           >
           <el-button
@@ -151,6 +153,7 @@
             link
             icon="Delete"
             @click="handleDelete(scope.row.id)"
+            v-hasPerm="['system:menu:delete']"
             >删除</el-button
           >
         </template>

@@ -38,7 +38,7 @@ const useUserStore = defineStore("useUserStore", {
                 // 设置用户信息
                 this.id = userData.id;
                 this.avatar = userData.avatar || "";
-                this.roleList = userData.roleList || [];
+                // this.roleList = userData.roleList || [];
                 this.permissionList = userData.permissionList || [];
                 this.username = userData.username || "";
                 this.roles = [...this.roleList];

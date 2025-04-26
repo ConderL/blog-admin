@@ -8,7 +8,9 @@ import { Task, TaskForm, TaskQuery, TaskRun, TaskStatus } from "./types";
  * @param params 查询条件
  * @returns 定时任务列表
  */
-export function getTaskList(params: TaskQuery): AxiosPromise<Result<PageResult<Task[]>>> {
+export function getTaskList(
+  params: TaskQuery
+): AxiosPromise<Result<PageResult<Task[]>>> {
   return request({
     url: "/admin/task/list",
     method: "get",
@@ -42,13 +44,12 @@ export function updateTask(data: TaskForm): AxiosPromise<Result<null>> {
 
 /**
  * 删除定时任务
- * @param data 任务id
+ * @param ids 任务id列表
  */
-export function deleteTask(data: number[]): AxiosPromise<Result<null>> {
+export function deleteTask(ids: number[]): AxiosPromise<Result<null>> {
   return request({
-    url: "/admin/task/delete",
+    url: `/admin/task/delete/${ids.join(",")}`,
     method: "delete",
-    data,
   });
 }
 
@@ -58,20 +59,18 @@ export function deleteTask(data: number[]): AxiosPromise<Result<null>> {
  */
 export function updateTaskStatus(data: TaskStatus): AxiosPromise<Result<null>> {
   return request({
-    url: "/admin/task/changeStatus",
+    url: `/admin/task/status/${data.id}/${data.status}`,
     method: "put",
-    data,
   });
 }
 
 /**
  * 执行定时任务
- * @param data 任务状态
+ * @param data 任务信息
  */
 export function runTask(data: TaskRun): AxiosPromise<Result<null>> {
   return request({
-    url: "/admin/task/run",
-    method: "put",
-    data,
+    url: `/admin/task/run/${data.id}`,
+    method: "post",
   });
 }

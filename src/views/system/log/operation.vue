@@ -35,6 +35,7 @@
           :disabled="logIdList.length === 0"
           icon="Delete"
           @click="handleDelete(undefined)"
+          v-hasPerm="['log:operation:delete']"
           >批量删除</el-button
         >
       </el-col>
@@ -136,6 +137,7 @@
             icon="Delete"
             link
             @click="handleDelete(scope.row.id)"
+            v-hasPerm="['log:operation:delete']"
           >
             删除
           </el-button>

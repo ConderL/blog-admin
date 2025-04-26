@@ -86,6 +86,7 @@
             icon="Edit"
             link
             @click="kick(scope.row.id)"
+            v-hasPerm="['monitor:online:kick']"
           >
             下线
           </el-button>

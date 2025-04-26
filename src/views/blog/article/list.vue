@@ -112,6 +112,7 @@
           icon="Delete"
           :disabled="articleIdList.length === 0"
           @click="handleDelete(undefined)"
+          v-hasPerm="['blog:article:delete']"
           >批量删除
         </el-button>
       </el-col>
@@ -122,6 +123,7 @@
           icon="Delete"
           :disabled="articleIdList.length === 0"
           @click="handleRecycle(undefined)"
+          v-hasPerm="['blog:article:recycle']"
           >批量回收
         </el-button>
       </el-col>
@@ -132,6 +134,7 @@
           icon="Finished"
           :disabled="articleIdList.length === 0"
           @click="handleRecycle(undefined)"
+          v-hasPerm="['blog:article:recycle']"
           >批量恢复
         </el-button>
       </el-col>
@@ -240,6 +243,7 @@
             :active-value="1"
             :inactive-value="0"
             @change="handleTop(scope.row)"
+            v-hasPerm="['blog:article:update']"
           ></el-switch>
         </template>
       </el-table-column>
@@ -258,6 +262,7 @@
             :active-value="1"
             :inactive-value="0"
             @change="handleRecommend(scope.row)"
+            v-hasPerm="['blog:article:update']"
           ></el-switch>
         </template>
       </el-table-column>
@@ -287,6 +292,7 @@
             icon="Edit"
             link
             @click="handleEdit(scope.row.id)"
+            v-hasPerm="['blog:article:update']"
             v-if="scope.row.isDelete == 0"
           >
             编辑
@@ -294,6 +300,7 @@
           <el-button
             type="danger"
             icon="Delete"
+            v-hasPerm="['blog:article:delete']"
             link
             @click="handleDelete(scope.row.id)"
           >
@@ -304,6 +311,7 @@
             icon="Delete"
             link
             @click="handleRecycle(scope.row.id)"
+            v-hasPerm="['blog:article:recycle']"
             v-if="queryParams.isDelete == 0"
           >
             回收
@@ -314,6 +322,7 @@
             link
             @click="handleRecycle(scope.row.id)"
             v-if="queryParams.isDelete == 1"
+            v-hasPerm="['blog:article:recycle']"
           >
             恢复
           </el-button>

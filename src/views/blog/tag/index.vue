@@ -27,6 +27,7 @@
           plain
           icon="Plus"
           @click="openModel(undefined)"
+          v-hasPerm="['blog:tag:add']"
           >新增</el-button
         >
       </el-col>
@@ -36,6 +37,7 @@
           plain
           :disabled="tagIdList.length === 0"
           icon="Delete"
+          v-hasPerm="['blog:tag:delete']"
           @click="handleDelete(undefined)"
           >批量删除</el-button
         >
@@ -97,6 +99,7 @@
             icon="Edit"
             link
             @click="openModel(scope.row)"
+            v-hasPerm="['blog:tag:update']"
           >
             编辑
           </el-button>
@@ -105,6 +108,7 @@
             icon="Delete"
             link
             @click="handleDelete(scope.row.id)"
+            v-hasPerm="['blog:tag:delete']"
           >
             删除
           </el-button>

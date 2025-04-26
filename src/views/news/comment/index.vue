@@ -61,6 +61,7 @@
           :disabled="commentIdList.length === 0"
           icon="Delete"
           @click="handleDelete(undefined)"
+          v-hasPerm="['news:comment:delete']"
           >批量删除</el-button
         >
       </el-col>
@@ -71,6 +72,7 @@
           :disabled="commentIdList.length === 0"
           icon="Check"
           @click="handleCheck(undefined)"
+          v-hasPerm="['news:comment:pass']"
           >批量通过</el-button
         >
       </el-col>
@@ -179,6 +181,7 @@
             icon="Finished"
             link
             @click="handleCheck(scope.row.id)"
+            v-hasPerm="['news:comment:pass']"
           >
             通过
           </el-button>
@@ -187,6 +190,7 @@
             icon="Delete"
             link
             @click="handleDelete(scope.row.id)"
+            v-hasPerm="['news:comment:delete']"
           >
             删除
           </el-button>

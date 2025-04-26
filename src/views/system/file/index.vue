@@ -33,6 +33,7 @@
           icon="Delete"
           :disabled="fileIdList.length === 0"
           @click="handleDelete(undefined)"
+          v-hasPerm="['system:file:delete']"
           >批量删除</el-button
         >
       </el-col>
@@ -145,6 +146,7 @@
             icon="Delete"
             link
             @click="handleDelete(scope.row.id)"
+            v-hasPerm="['system:file:delete']"
             >删除</el-button
           >
         </template>

@@ -6,7 +6,11 @@
         v-model="articleForm.articleTitle"
         placeholder="请输入文章标题"
       ></el-input>
-      <el-button type="danger" style="margin-left: 10px" @click="openModel"
+      <el-button
+        type="danger"
+        style="margin-left: 10px"
+        @click="openModel"
+        v-hasPerm="['blog:article:add']"
         >发布文章</el-button
       >
     </div>

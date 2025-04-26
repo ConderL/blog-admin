@@ -3,16 +3,33 @@
     <!-- 搜索栏 -->
     <el-form :model="queryParams" :inline="true">
       <el-form-item label="用户昵称">
-        <el-input @keyup.enter="handleQuery" v-model="queryParams.keyword" style="width: 200px" placeholder="请输入用户昵称"
-          clearable />
+        <el-input
+          @keyup.enter="handleQuery"
+          v-model="queryParams.keyword"
+          style="width: 200px"
+          placeholder="请输入用户昵称"
+          clearable
+        />
       </el-form-item>
       <el-form-item label="登录方式">
-        <el-select v-model="queryParams.loginType" placeholder="请选择登录方式" clearable style="width: 200px">
-          <el-option v-for="item in typeList" :key="item.value" :label="item.label" :value="item.value" />
+        <el-select
+          v-model="queryParams.loginType"
+          placeholder="请选择登录方式"
+          clearable
+          style="width: 200px"
+        >
+          <el-option
+            v-for="item in typeList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery"
+          >搜索</el-button
+        >
       </el-form-item>
     </el-form>
     <!-- 表格展示 -->
@@ -24,9 +41,18 @@
         </template>
       </el-table-column>
       <!-- 昵称 -->
-      <el-table-column prop="nickname" label="昵称" align="center"></el-table-column>
+      <el-table-column
+        prop="nickname"
+        label="昵称"
+        align="center"
+      ></el-table-column>
       <!-- 登录方式 -->
-      <el-table-column prop="loginType" label="登录方式" align="center" width="100">
+      <el-table-column
+        prop="loginType"
+        label="登录方式"
+        align="center"
+        width="100"
+      >
         <template #default="scope">
           <el-tag type="success" v-if="scope.row.loginType == 1">邮箱</el-tag>
           <el-tag v-if="scope.row.loginType == 2">QQ</el-tag>
@@ -35,9 +61,18 @@
         </template>
       </el-table-column>
       <!-- 用户角色 -->
-      <el-table-column prop="roleList" label="用户角色" align="center" width="150">
+      <el-table-column
+        prop="roleList"
+        label="用户角色"
+        align="center"
+        width="150"
+      >
         <template #default="scope">
-          <el-tag v-for="item in scope.row.roleList" :key="item.id" style="margin-right:4px;margin-top:4px">
+          <el-tag
+            v-for="item in scope.row.roleList"
+            :key="item.id"
+            style="margin-right: 4px; margin-top: 4px"
+          >
             {{ item.roleName }}
           </el-tag>
         </template>
@@ -45,57 +80,110 @@
       <!-- 状态 -->
       <el-table-column prop="status" label="状态" align="center" width="100">
         <template #default="scope">
-          <el-switch v-model="scope.row.isDisable" active-color="#13ce66" inactive-color="#ff4949" :active-value="0"
-            :inactive-value="1" @change="handleChangeStatus(scope.row)"></el-switch>
+          <el-switch
+            v-model="scope.row.isDisable"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            :active-value="0"
+            :inactive-value="1"
+            @change="handleChangeStatus(scope.row)"
+            v-hasPerm="['system:user:status']"
+          ></el-switch>
         </template>
       </el-table-column>
       <!-- 登录ip -->
-      <el-table-column prop="ipAddress" label="登录ip" align="center"></el-table-column>
+      <el-table-column
+        prop="ipAddress"
+        label="登录ip"
+        align="center"
+      ></el-table-column>
       <!-- 登录地址 -->
-      <el-table-column prop="ipSource" label="登录地址" align="center"></el-table-column>
+      <el-table-column
+        prop="ipSource"
+        label="登录地址"
+        align="center"
+      ></el-table-column>
       <!-- 创建时间 -->
-      <el-table-column prop="createTime" label="创建时间" align="center" width="220">
+      <el-table-column
+        prop="createTime"
+        label="创建时间"
+        align="center"
+        width="220"
+      >
         <template #default="scope">
           <div class="create-time">
             <el-icon>
               <clock />
             </el-icon>
-            <span style="margin-left: 10px">{{ formatDateTime(scope.row.createTime) }}</span>
+            <span style="margin-left: 10px">{{
+              formatDateTime(scope.row.createTime)
+            }}</span>
           </div>
         </template>
       </el-table-column>
       <!-- 登录时间 -->
-      <el-table-column prop="loginTime" label="登录时间" align="center" width="220">
+      <el-table-column
+        prop="loginTime"
+        label="登录时间"
+        align="center"
+        width="220"
+      >
         <template #default="scope">
           <div class="create-time">
             <el-icon>
               <clock />
             </el-icon>
-            <span style="margin-left: 10px">{{ formatDateTime(scope.row.loginTime) }}</span>
+            <span style="margin-left: 10px">{{
+              formatDateTime(scope.row.loginTime)
+            }}</span>
           </div>
         </template>
       </el-table-column>
       <!-- 操作 -->
       <el-table-column label="操作" align="center" width="130">
         <template #default="scope">
-          <el-button type="primary" icon="Edit" link @click="openModel(scope.row)">
+          <el-button
+            type="primary"
+            icon="Edit"
+            link
+            @click="openModel(scope.row)"
+            v-hasPerm="['system:user:update']"
+          >
             编辑
           </el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <pagination v-if="count > 0" :total="count" v-model:page="queryParams.current" v-model:limit="queryParams.size"
-      @pagination="getList" />
+    <pagination
+      v-if="count > 0"
+      :total="count"
+      v-model:page="queryParams.current"
+      v-model:limit="queryParams.size"
+      @pagination="getList"
+    />
     <!-- 添加或修改对话框 -->
     <el-dialog title="修改用户" v-model="update" width="500px" append-to-body>
-      <el-form ref="userFormRef" label-width="100px" :model="userForm" :rules="rules">
+      <el-form
+        ref="userFormRef"
+        label-width="100px"
+        :model="userForm"
+        :rules="rules"
+      >
         <el-form-item label="昵称" prop="nickname">
-          <el-input placeholder="请输入昵称" v-model="userForm.nickname" style="width: 250px;" />
+          <el-input
+            placeholder="请输入昵称"
+            v-model="userForm.nickname"
+            style="width: 250px"
+          />
         </el-form-item>
         <el-form-item label="角色" prop="roleIdList">
           <el-checkbox-group v-model="roleIdList">
-            <el-checkbox v-for="item in userRoleList" :key="item.id" :label="item.id">
+            <el-checkbox
+              v-for="item in userRoleList"
+              :key="item.id"
+              :label="item.id"
+            >
               {{ item.roleName }}
             </el-checkbox>
           </el-checkbox-group>
@@ -112,16 +200,21 @@
 </template>
 
 <script setup lang="ts">
-import { getUserList, getUserRoleList, updateUser, updateUserStatus } from '@/api/user';
-import { User, UserForm, UserQuery, UserRole } from '@/api/user/types';
+import {
+  getUserList,
+  getUserRoleList,
+  updateUser,
+  updateUserStatus,
+} from "@/api/user";
+import { User, UserForm, UserQuery, UserRole } from "@/api/user/types";
 import { formatDateTime } from "@/utils/date";
-import { messageConfirm, notifySuccess } from '@/utils/modal';
-import { FormInstance, FormRules } from 'element-plus';
-import { onMounted, reactive, ref, toRefs } from 'vue';
+import { messageConfirm, notifySuccess } from "@/utils/modal";
+import { FormInstance, FormRules } from "element-plus";
+import { onMounted, reactive, ref, toRefs } from "vue";
 const userFormRef = ref<FormInstance>();
 const rules = reactive<FormRules>({
   nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
-  roleIdList: [{ required: true, message: "角色不能为空", trigger: "click" }]
+  roleIdList: [{ required: true, message: "角色不能为空", trigger: "click" }],
 });
 const data = reactive({
   count: 0,
@@ -169,7 +262,7 @@ const openModel = (user: User) => {
   roleIdList.value = [];
   userForm.value.id = user.id;
   userForm.value.nickname = user.nickname;
-  user.roleList.forEach(item => {
+  user.roleList.forEach((item) => {
     roleIdList.value.push(item.id);
   });
   userFormRef.value?.clearValidate();
@@ -177,15 +270,21 @@ const openModel = (user: User) => {
 };
 const handleChangeStatus = (user: User) => {
   let text = user.isDisable === 0 ? "解封" : "封禁";
-  messageConfirm("确定要" + text + user.nickname + "吗?").then(() => {
-    updateUserStatus({ id: user.id, isDisable: user.isDisable }).then(({ data }) => {
-      if (data.flag) {
-        notifySuccess(data.msg);
-      } else {
-        user.isDisable = user.isDisable === 0 ? 1 : 0;
-      }
+  messageConfirm("确定要" + text + user.nickname + "吗?")
+    .then(() => {
+      updateUserStatus({ id: user.id, isDisable: user.isDisable }).then(
+        ({ data }) => {
+          if (data.flag) {
+            notifySuccess(data.msg);
+          } else {
+            user.isDisable = user.isDisable === 0 ? 1 : 0;
+          }
+        }
+      );
     })
-  }).catch(() => { user.isDisable = user.isDisable === 0 ? 1 : 0; });
+    .catch(() => {
+      user.isDisable = user.isDisable === 0 ? 1 : 0;
+    });
 };
 const submitForm = () => {
   userForm.value.roleIdList = roleIdList.value;
@@ -197,9 +296,9 @@ const submitForm = () => {
           getList();
         }
         update.value = false;
-      })
+      });
     }
-  })
+  });
 };
 const getList = () => {
   loading.value = true;
@@ -207,7 +306,7 @@ const getList = () => {
     userList.value = data.data.recordList;
     count.value = data.data.count;
     loading.value = false;
-  })
+  });
 };
 const handleQuery = () => {
   queryParams.value.current = 1;
@@ -217,7 +316,7 @@ onMounted(() => {
   getList();
   getUserRoleList().then(({ data }) => {
     userRoleList.value = data.data;
-  })
+  });
 });
 </script>
 

@@ -25,12 +25,15 @@ router.beforeEach((to, from, next) => {
       next({ path: "/" });
       NProgress.done();
     } else {
+      console.log(user, "user");
       if (user.roleList.length === 0) {
+        console.log("用户角色列表为空，需要重新登录");
         isRelogin.show = true;
         // 判断当前用户是否已拉取完user_info信息
         user
           .GetInfo()
           .then(() => {
+            console.log("用户信息已获取，开始生成路由");
             isRelogin.show = false;
             permission.generateRoutes().then((accessRoutes) => {
               accessRoutes.forEach((route) => {

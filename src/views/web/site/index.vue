@@ -11,7 +11,12 @@
             <span>网站信息</span>
           </span>
         </template>
-        <el-form label-width="80px" :model="siteConfig" label-position="left">
+        <el-form
+          label-width="80px"
+          :model="siteConfig"
+          label-position="left"
+          v-hasPerm="['web:site:update']"
+        >
           <el-row>
             <el-col :md="6">
               <el-form-item label="用户头像">
@@ -114,7 +119,12 @@
             <span>作者信息</span>
           </span>
         </template>
-        <el-form label-width="80px" :model="siteConfig" label-position="left">
+        <el-form
+          label-width="80px"
+          :model="siteConfig"
+          label-position="left"
+          v-hasPerm="['web:site:update']"
+        >
           <el-form-item label="作者头像">
             <el-upload
               class="avatar-uploader"
@@ -179,7 +189,12 @@
             <span>社交信息</span>
           </span>
         </template>
-        <el-form label-width="70px" :model="siteConfig" label-position="left">
+        <el-form
+          label-width="70px"
+          :model="siteConfig"
+          label-position="left"
+          v-hasPerm="['web:site:update']"
+        >
           <el-checkbox-group v-model="socialList">
             <el-form-item label="Github">
               <el-input
@@ -225,7 +240,12 @@
             <span>审核&打赏</span>
           </span>
         </template>
-        <el-form label-width="100px" :model="siteConfig" label-position="left">
+        <el-form
+          label-width="100px"
+          :model="siteConfig"
+          label-position="left"
+          v-hasPerm="['web:site:update']"
+        >
           <el-form-item label="评论审核">
             <el-radio-group
               v-model="siteConfig.commentCheck"
@@ -320,7 +340,12 @@
             <span>壁纸设置</span>
           </span>
         </template>
-        <el-form label-width="120px" :model="siteConfig" label-position="left">
+        <el-form
+          label-width="120px"
+          :model="siteConfig"
+          label-position="left"
+          v-hasPerm="['web:site:update']"
+        >
           <el-row>
             <el-col :span="8">
               <el-form-item label="归档">
@@ -525,7 +550,12 @@
             <span>其他设置</span>
           </span>
         </template>
-        <el-form label-width="120px" :model="siteConfig" label-position="left">
+        <el-form
+          label-width="120px"
+          :model="siteConfig"
+          label-position="left"
+          v-hasPerm="['web:site:update']"
+        >
           <el-form-item label="文章默认封面">
             <el-upload
               class="avatar-uploader"

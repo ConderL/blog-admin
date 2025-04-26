@@ -34,7 +34,12 @@
         </el-form>
         <template #footer>
           <div class="dialog-footer">
-            <el-button type="primary" @click="submitForm">确 定</el-button>
+            <el-button
+              type="primary"
+              @click="submitForm"
+              v-hasPerm="['system:user:update']"
+              >确 定</el-button
+            >
             <el-button @click="open = false">取 消</el-button>
           </div>
         </template>

@@ -52,6 +52,7 @@
           plain
           icon="Plus"
           @click="openModel(undefined)"
+          v-hasPerm="['monitor:task:add']"
           >新增</el-button
         >
       </el-col>
@@ -62,6 +63,7 @@
           :disabled="taskIdList.length === 0"
           icon="Delete"
           @click="handleDelete(undefined)"
+          v-hasPerm="['monitor:task:delete']"
           >批量删除</el-button
         >
       </el-col>
@@ -127,6 +129,7 @@
             :active-value="0"
             :inactive-value="1"
             @change="handleChangeStatus(scope.row)"
+            v-hasPerm="['monitor:task:status']"
           ></el-switch>
         </template>
       </el-table-column>
@@ -157,6 +160,7 @@
             icon="Edit"
             link
             @click="openModel(scope.row)"
+            v-hasPerm="['monitor:task:update']"
           >
             编辑
           </el-button>
@@ -165,6 +169,7 @@
             icon="Delete"
             link
             @click="handleDelete(scope.row.id)"
+            v-hasPerm="['monitor:task:delete']"
           >
             删除
           </el-button>
@@ -174,7 +179,10 @@
             <el-button type="info" icon="DArrowRight" link>更多</el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="handleRun" icon="CaretRight"
+                <el-dropdown-item
+                  command="handleRun"
+                  icon="CaretRight"
+                  v-hasPerm="['monitor:task:run']"
                   >执行一次</el-dropdown-item
                 >
                 <el-dropdown-item command="handleView" icon="View"
@@ -249,24 +257,78 @@
                   <el-tooltip placement="top">
                     <template #content>
                       <div>
-                        Bean调用示例：timedTask.ryNoParams
-                        <br />Class类调用示例：com.Conder.quartz.task.timedTask.ryParams
-                        <br />参数说明：支持字符串，布尔类型，长整型，浮点型，整型
+                        系统任务调用示例：taskService.handleDatabaseBackup
+                        <br />常用任务： <br />1.
+                        taskService.handleDatabaseBackup - 数据库备份 <br />2.
+                        taskService.handleHourlyVisitStats - 每小时访问统计
+                        <br />3. taskService.handleDataCleanup - 数据清理
+                        <br />4. taskService.handleExpiredSessions -
+                        清理过期会话 <br />5. taskService.clearVisitorRecords -
+                        清除访客记录 <br />6. taskService.clearOldVisitLogs -
+                        清理旧访问日志 <br />7. system.logMemoryUsage -
+                        记录内存使用
                       </div>
                     </template>
                     <el-icon><question-filled /></el-icon>
                   </el-tooltip>
                 </span>
               </template>
-              <el-input
+              <el-select
                 v-model="taskForm.invokeTarget"
-                placeholder="请输入调用目标字符串"
-              ></el-input>
+                placeholder="请输入或选择调用目标"
+                filterable
+                allow-create
+                style="width: 100%"
+              >
+                <el-option
+                  value="taskService.handleDatabaseBackup"
+                  label="数据库备份"
+                />
+                <el-option
+                  value="taskService.handleHourlyVisitStats"
+                  label="每小时访问统计"
+                />
+                <el-option
+                  value="taskService.handleDataCleanup"
+                  label="数据清理"
+                />
+                <el-option
+                  value="taskService.handleExpiredSessions"
+                  label="清理过期会话"
+                />
+                <el-option
+                  value="taskService.clearVisitorRecords"
+                  label="清除访客记录"
+                />
+                <el-option
+                  value="taskService.clearOldVisitLogs"
+                  label="清理旧访问日志"
+                />
+                <el-option value="taskService.testTask" label="测试任务" />
+                <el-option value="system.logMemoryUsage" label="记录内存使用" />
+                <el-option value="system.logActiveUsers" label="监控活跃用户" />
+              </el-select>
             </el-form-item>
           </el-col>
           <!-- cron表达式 -->
           <el-col :span="24">
             <el-form-item label="cron表达式" prop="cronExpression">
+              <template #label>
+                <span>
+                  cron表达式
+                  <el-tooltip placement="top">
+                    <template #content>
+                      <div>
+                        格式：秒 分 时 日 月 周
+                        <br />常用表达式： <br />1. 0 0 0 * * ? - 每天0点执行
+                        <br />2. 0 0 * * * ? - 每小时整点执行 <br />3. 0 */5 * *
+                        * ? - 每5分钟执行一次 <br />4. 0 0 0 1 * ? - 每月1号执行
+                      </div>
+                    </template>
+                    <el-icon><question-filled /></el-icon>
+                  </el-tooltip>
+                </span>
+              </template>
               <el-input
                 v-model="taskForm.cronExpression"
                 placeholder="请输入cron执行表达式"
@@ -426,6 +488,7 @@ import { messageConfirm, notifySuccess } from "@/utils/modal";
 import { FormInstance, FormRules } from "element-plus";
 import { onMounted, reactive, ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 const router = useRouter();
 const taskFormRef = ref<FormInstance>();
 const rules = reactive<FormRules>({
@@ -501,6 +564,11 @@ const handleTaskLog = () => {
   router.push("/log/task");
 };
 const crontabFill = (value: string) => {
+  // 确保cron表达式包含秒字段
+  if (value && value.split(/\s+/).length === 5) {
+    // 如果是5位表达式（分 时 日 月 周），添加秒位
+    value = "0 " + value;
+  }
   taskForm.value.cronExpression = value;
 };
 const handleShowCron = () => {
@@ -516,12 +584,12 @@ const openModel = (task?: Task) => {
     taskForm.value = {
       id: undefined,
       taskName: "",
-      taskGroup: "",
+      taskGroup: "DEFAULT", // 默认分组
       invokeTarget: "",
       cronExpression: "",
       misfirePolicy: 3,
       concurrent: 0,
-      status: 1,
+      status: 0, // 默认为启用状态（运行）
       remark: "",
       nextValidTime: new Date(),
       createTime: "",
@@ -559,21 +627,45 @@ const handleView = (task: Task) => {
 const submitForm = () => {
   taskFormRef.value?.validate((valid) => {
     if (valid) {
-      if (taskForm.value.id !== undefined) {
-        updateTask(taskForm.value).then(({ data }) => {
-          if (data.flag) {
-            notifySuccess(data.msg);
-            getList();
-          }
+      // 确保数字字段是数字类型
+      if (taskForm.value.misfirePolicy !== undefined) {
+        taskForm.value.misfirePolicy = Number(taskForm.value.misfirePolicy);
+      }
+      if (taskForm.value.concurrent !== undefined) {
+        taskForm.value.concurrent = Number(taskForm.value.concurrent);
+      }
+      if (taskForm.value.status !== undefined) {
+        taskForm.value.status = Number(taskForm.value.status);
+      }
+
+      // 确保cron表达式格式正确
+      if (taskForm.value.cronExpression) {
+        // 检查是否为5位cron表达式（不含秒），如是则补充秒位
+        const cronParts = taskForm.value.cronExpression.trim().split(/\s+/);
+        if (cronParts.length === 5) {
+          // 自动在开头添加0表示秒
+          taskForm.value.cronExpression = `0 ${taskForm.value.cronExpression}`;
+        } else if (cronParts.length !== 6) {
+          ElMessage.error("Cron表达式格式错误，请使用5位或6位格式");
+          return;
+        }
+      }
+
+      if (taskForm.value.id) {
+        updateTask(taskForm.value).then((response) => {
+          notifySuccess("修改成功");
           addOrUpdate.value = false;
+          getList();
         });
       } else {
-        addTask(taskForm.value).then(({ data }) => {
-          if (data.flag) {
-            notifySuccess(data.msg);
-            getList();
-          }
+        // 确保taskGroup有值
+        if (!taskForm.value.taskGroup) {
+          taskForm.value.taskGroup = "DEFAULT";
+        }
+        addTask(taskForm.value).then((response) => {
+          notifySuccess("新增成功");
           addOrUpdate.value = false;
+          getList();
         });
       }
     }
