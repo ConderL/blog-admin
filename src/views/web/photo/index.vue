@@ -150,54 +150,116 @@
     </el-dialog>
     <!-- 上传对话框 -->
     <el-dialog title="上传照片" v-model="upload" width="850px" append-to-body>
-      <div class="upload-container">
-        <el-upload
-          v-show="uploadList.length > 0"
-          :headers="authorization"
-          class="avatar-uploader"
-          multiple
-          action="/api/admin/photo/upload"
-          :before-upload="beforeUpload"
-          :on-success="handleSuccess"
-          :on-remove="handleRemove"
-          :on-preview="handlePictureCardPreview"
-          list-type="picture-card"
-          :file-list="uploadList"
-          accept="image/*"
-        >
-          <img class="avatar" />
-          <el-icon class="avatar-uploader-icon">
-            <Plus />
-          </el-icon>
-        </el-upload>
-        <div class="upload">
-          <el-upload
-            v-show="uploadList.length === 0"
-            :headers="authorization"
-            drag
-            multiple
-            action="/api/admin/photo/upload"
-            :before-upload="beforeUpload"
-            :show-file-list="false"
-            accept="image/*"
-            :on-success="handleSuccess"
-            style="width: 360px"
-          >
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">
-              将文件拖到此处，或<em>点击上传</em>
+      <el-tabs v-model="activeUploadTab">
+        <el-tab-pane label="本地上传" name="local">
+          <div class="upload-container">
+            <el-upload
+              v-show="uploadList.length > 0"
+              :headers="authorization"
+              class="avatar-uploader"
+              multiple
+              action="/api/admin/photo/upload"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-remove="handleRemove"
+              :on-preview="handlePictureCardPreview"
+              list-type="picture-card"
+              :file-list="uploadList"
+              accept="image/*"
+            >
+              <img class="avatar" />
+              <el-icon class="avatar-uploader-icon">
+                <Plus />
+              </el-icon>
+            </el-upload>
+            <div class="upload">
+              <el-upload
+                v-show="uploadList.length === 0"
+                :headers="authorization"
+                drag
+                multiple
+                action="/api/admin/photo/upload"
+                :before-upload="beforeUpload"
+                :show-file-list="false"
+                accept="image/*"
+                :on-success="handleSuccess"
+                style="width: 360px"
+              >
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text">
+                  将文件拖到此处，或<em>点击上传</em>
+                </div>
+                <img width="360" />
+              </el-upload>
             </div>
-            <img width="360" />
-          </el-upload>
-        </div>
-      </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="URL输入" name="url">
+          <div class="url-input-container">
+            <div
+              v-for="(item, index) in urlInputList"
+              :key="index"
+              class="url-input-item"
+            >
+              <el-input
+                v-model="item.url"
+                placeholder="请输入图片URL"
+                @input="handleUrlInput(index)"
+                clearable
+                class="url-input"
+              />
+              <div class="url-preview-container">
+                <el-image
+                  class="url-preview"
+                  fit="cover"
+                  :src="item.url"
+                  :preview-src-list="item.url ? [item.url] : []"
+                  :initial-index="0"
+                >
+                  <template #error>
+                    <div class="url-preview-placeholder">
+                      <el-icon><Picture /></el-icon>
+                    </div>
+                  </template>
+                </el-image>
+              </div>
+              <div class="url-actions">
+                <el-button
+                  type="primary"
+                  circle
+                  @click="addUrlInput"
+                  v-if="index === urlInputList.length - 1"
+                >
+                  <el-icon><Plus /></el-icon>
+                </el-button>
+                <el-button
+                  type="danger"
+                  circle
+                  @click="removeUrlInput(index)"
+                  v-if="urlInputList.length > 1"
+                >
+                  <el-icon><Delete /></el-icon>
+                </el-button>
+              </div>
+            </div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
       <template #footer>
         <div class="dialog-footer">
-          <div>共上传{{ uploadList.length }}张照片</div>
+          <div>
+            <span v-if="activeUploadTab === 'local'"
+              >共上传{{ uploadList.length }}张照片</span
+            >
+            <span v-else>共添加{{ getValidUrlCount() }}张照片</span>
+          </div>
           <div>
             <el-button
               type="primary"
-              :disabled="uploadList.length == 0"
+              :disabled="
+                (activeUploadTab === 'local' && uploadList.length === 0) ||
+                (activeUploadTab === 'url' && getValidUrlCount() === 0)
+              "
               @click="handleAdd"
               >确 定</el-button
             >
@@ -222,7 +284,6 @@ import {
   updatePhoto,
 } from "@/api/photo";
 import { AlbumInfo, Photo, PhotoForm, PhotoQuery } from "@/api/photo/types";
-import { Picture } from "@/model";
 import { messageConfirm, notifySuccess } from "@/utils/modal";
 import { checkPermission } from "@/utils/permission";
 import { getToken, token_prefix } from "@/utils/token";
@@ -236,6 +297,14 @@ import {
 import * as imageConversion from "image-conversion";
 import { computed, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+
+// 定义上传图片项接口
+interface UploadItem {
+  url: string;
+  [key: string]: any;
+}
+
 const photoFormRef = ref<FormInstance>();
 const rules = reactive<FormRules>({
   photoName: [{ required: true, message: "请输入照片名称", trigger: "blur" }],
@@ -265,7 +334,9 @@ const data = reactive({
   selectPhotoIdList: [] as number[],
   photoList: [] as Photo[],
   albumInfo: {} as AlbumInfo,
-  uploadList: [] as Picture[],
+  uploadList: [] as UploadItem[], // 使用自定义的UploadItem接口
+  activeUploadTab: "local",
+  urlInputList: [] as { url: string }[],
 });
 const {
   count,
@@ -283,6 +354,8 @@ const {
   photoList,
   albumInfo,
   uploadList,
+  activeUploadTab,
+  urlInputList,
 } = toRefs(data);
 watch(
   () => photoList.value,
@@ -358,24 +431,82 @@ const handleDelete = () => {
     })
     .catch(() => {});
 };
+const addUrlInput = () => {
+  urlInputList.value.push({ url: "" });
+};
+const removeUrlInput = (index: number) => {
+  urlInputList.value.splice(index, 1);
+};
+const handleUrlInput = (index: number) => {
+  console.log(
+    `URL at index ${index} changed: ${urlInputList.value[index].url}`
+  );
+};
+const getValidUrlCount = () => {
+  return urlInputList.value.filter((item) => item.url.trim() !== "").length;
+};
 const handleAdd = () => {
   let photoUrlList: string[] = [];
-  if (uploadList.value.length > 0) {
+
+  // 收集本地上传的图片URL
+  if (activeUploadTab.value === "local" && uploadList.value.length > 0) {
     uploadList.value.forEach((item) => {
       photoUrlList.push(item.url);
     });
   }
+
+  // 收集手动输入的有效图片URL
+  if (activeUploadTab.value === "url") {
+    urlInputList.value.forEach((item) => {
+      if (item.url.trim() !== "") {
+        // 处理过长的URL
+        photoUrlList.push(item.url);
+      }
+    });
+  }
+
+  // 确保有图片URL要上传
+  if (photoUrlList.length === 0) {
+    return;
+  }
+
+  // 处理可能过长的URL
+  const processedUrls = photoUrlList.map((url) => {
+    // 如果URL超过200个字符，可以尝试找到最后一个斜杠后的部分作为文件名
+    // 并将其转换为短URL - 这只是示例处理，实际中可能需要更复杂的处理
+    if (url.length > 200) {
+      console.warn("URL过长，可能导致数据库存储问题:", url);
+
+      // 这里可以添加处理逻辑，例如调用短URL服务
+      // 或者提取URL的关键部分
+    }
+    return url;
+  });
+
   addPhoto({
     albumId: Number(route.params.albumId),
-    photoUrlList: photoUrlList,
-  }).then(({ data }) => {
-    if (data.flag) {
-      notifySuccess(data.msg);
-      uploadList.value = [];
-      getList();
-    }
-    upload.value = false;
-  });
+    photoUrlList: processedUrls,
+  })
+    .then(({ data }) => {
+      if (data.flag) {
+        notifySuccess(data.msg);
+        // 清空所有输入
+        uploadList.value = [];
+        urlInputList.value = [{ url: "" }];
+        getList();
+      } else {
+        // 处理URL过长错误
+        ElMessage.error(
+          data.msg || "图片URL过长，请使用较短的URL或上传本地图片"
+        );
+      }
+      upload.value = false;
+    })
+    .catch((err) => {
+      console.error("添加照片失败:", err);
+      ElMessage.error("添加照片失败，URL可能过长");
+      upload.value = false;
+    });
 };
 const submitForm = () => {
   photoFormRef.value?.validate((valid) => {
@@ -403,6 +534,11 @@ onMounted(() => {
   getAlbumInfo(Number(route.params.albumId)).then(({ data }) => {
     albumInfo.value = data.data;
   });
+
+  // 初始化URL输入列表，默认添加一个空输入框
+  if (urlInputList.value.length === 0) {
+    urlInputList.value = [{ url: "" }];
+  }
 });
 </script>
 
@@ -476,5 +612,48 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.url-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.url-input-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.url-input {
+  width: 300px;
+}
+
+.url-preview-container {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.url-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.url-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.url-preview-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 </style>
