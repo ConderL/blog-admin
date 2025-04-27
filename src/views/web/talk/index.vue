@@ -149,6 +149,20 @@
                 height="24"
               />
             </span>
+            <span
+              class="emoji-item"
+              v-for="(value, key, index) of emojiGenshinList"
+              :key="index"
+              @click="addEmoji(key, value, 60)"
+            >
+              <img
+                :src="value"
+                :title="key"
+                class="emoji"
+                width="60"
+                height="60"
+              />
+            </span>
           </el-popover>
         </el-col>
         <el-col :span="1.5">
@@ -248,7 +262,7 @@ import { Talk, TalkForm, TalkQuery } from "@/api/talk/types";
 import Editor from "@/components/Editor/index.vue";
 import { Picture } from "@/model";
 import { formatDateTime } from "@/utils/date";
-import { emojiList } from "@/utils/emoji";
+import { emojiList, emojiGenshinList } from "@/utils/emoji";
 import { messageConfirm, notifySuccess } from "@/utils/modal";
 import { getToken, token_prefix } from "@/utils/token";
 import { AxiosResponse } from "axios";
@@ -371,11 +385,15 @@ const handleOperation = (command: string) => {
 const handleCommand = (command: number) => {
   talkForm.value.status = command;
 };
-const addEmoji = (key: string, value: string) => {
+const addEmoji = (key: string, value: string, size: number = 24) => {
   editorRef.value.addText(
     "<img src= '" +
       value +
-      "' width='24'height='24' alt=" +
+      "' width='" +
+      size +
+      "'height='" +
+      size +
+      "' alt=" +
       key +
       " style='margin: 0 1px;vertical-align: text-bottom'/>"
   );

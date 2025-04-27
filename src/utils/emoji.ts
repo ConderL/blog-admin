@@ -121,6 +121,9 @@ export const emojiList: Record<string, string> = {
     "http://img.conder.top/emoji/b7840db4b1f9f4726b7cb23c0972720c1698d661.png",
   "[阴险]":
     "http://img.conder.top/emoji/ba8d5f8e7d136d59aab52c40fd3b8a43419eb03c.png",
+};
+
+export const emojiGenshinList: Record<string, string> = {
   "[可莉_冲鸭]":
     "http://img.conder.top/emoji-genshin/3d997d212df3f33b86da0208e755a522.png",
   "[可莉_求求你]":
