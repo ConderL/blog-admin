@@ -363,6 +363,7 @@ watch(
     photoIdList.value = [];
     if (newValue && newValue.length > 0) {
       newValue.forEach((item) => {
+        item.photoName = item.photoName.slice(0, 20);
         photoIdList.value.push(item.id);
       });
     }
@@ -570,8 +571,9 @@ onMounted(() => {
 
 .photo-item {
   position: relative;
-  width: 100%;
+  // width: 100%;
   cursor: pointer;
+  overflow: hidden;
 
   margin-bottom: 1rem;
 
@@ -583,7 +585,7 @@ onMounted(() => {
   }
 
   .photo-cover {
-    width: 100%;
+    // width: 100%;
     height: 7rem;
     border-radius: 4px;
   }
